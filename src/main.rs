@@ -1,5 +1,6 @@
 mod app;
 mod ascii;
+mod config;
 mod event;
 mod history;
 mod notify;
