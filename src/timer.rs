@@ -63,11 +63,16 @@ impl Timer {
         1.0 - (self.remaining.as_secs_f64() / self.total.as_secs_f64())
     }
 
-    /// Format as MM:SS
+    /// Format as MM:SS or H:MM:SS for durations >= 100 minutes
     pub fn display(&self) -> String {
-        let secs = self.remaining.as_secs();
-        let m = secs / 60;
-        let s = secs % 60;
-        format!("{:02}:{:02}", m, s)
+        let total_secs = self.remaining.as_secs();
+        let h = total_secs / 3600;
+        let m = (total_secs % 3600) / 60;
+        let s = total_secs % 60;
+        if h > 0 {
+            format!("{}:{:02}:{:02}", h, m, s)
+        } else {
+            format!("{:02}:{:02}", m, s)
+        }
     }
 }
