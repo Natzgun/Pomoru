@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crossterm::event::{KeyCode, KeyEvent};
 
+use crate::history::{History, SessionRecord};
 use crate::notify;
 use crate::schedule::Schedule;
 use crate::timer::Timer;
@@ -100,6 +101,7 @@ impl App {
                         self.timer.start();
                     } else {
                         notify::session_done(self.completed_cycles);
+                        self.save_session();
                         self.state = PomodoroState::Done;
                     }
                 }
@@ -245,8 +247,39 @@ impl App {
             self.completed_cycles += 1;
         }
         notify::session_done(self.completed_cycles);
+        self.save_session();
         self.state = PomodoroState::Done;
         self.timer.pause();
+    }
+
+    fn save_session(&self) {
+        if self.completed_cycles == 0 {
+            return;
+        }
+        let hours_planned: Vec<u8> = self
+            .schedule
+            .blocks
+            .iter()
+            .enumerate()
+            .filter(|(_, b)| {
+                matches!(
+                    b,
+                    crate::schedule::BlockState::Completed { .. }
+                        | crate::schedule::BlockState::Active { .. }
+                        | crate::schedule::BlockState::Planned
+                )
+            })
+            .map(|(i, _)| i as u8)
+            .collect();
+        let record = SessionRecord {
+            date: chrono::Local::now(),
+            study_minutes: self.study_minutes,
+            break_minutes: self.break_minutes,
+            cycles_completed: self.completed_cycles,
+            hours_planned,
+        };
+        let mut history = History::load();
+        history.add_session(record);
     }
 
     fn skip_phase(&mut self) {
