@@ -240,11 +240,11 @@ impl App {
     }
 
     fn finish_session(&mut self) {
-        // Complete current active block if studying
         if self.state == PomodoroState::Studying {
             self.schedule.complete_active();
             self.completed_cycles += 1;
         }
+        notify::session_done(self.completed_cycles);
         self.state = PomodoroState::Done;
         self.timer.pause();
     }
