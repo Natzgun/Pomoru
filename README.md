@@ -1,10 +1,10 @@
-# pomoru
+# Pomoru 🍅
 
 A minimal TUI Pomodoro timer with a visual 24-hour schedule, built in Rust.
 
 Plan your study blocks, track your focus sessions, and stay productive — all from the terminal.
 
-![pomoru](assets/preview.png)
+![Pomoru](assets/preview-pom.png)
 
 ## Features
 
