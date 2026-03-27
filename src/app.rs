@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::history::{History, SessionRecord};
 use crate::notify;
@@ -122,26 +122,45 @@ impl App {
     }
 
     fn handle_setup_key(&mut self, key: KeyEvent) {
+        let shift = key.modifiers.contains(KeyModifiers::SHIFT);
+
         match key.code {
             KeyCode::Char('q') | KeyCode::Esc => {
                 self.should_quit = true;
             }
 
-            // Navigate schedule
-            KeyCode::Left | KeyCode::Char('h') => {
+            // Navigate schedule (shift = move + toggle)
+            KeyCode::Left | KeyCode::Char('h') | KeyCode::Char('H') => {
+                if shift || key.code == KeyCode::Char('H') {
+                    self.schedule.toggle_block(self.cursor);
+                }
                 if self.cursor > 0 {
                     self.cursor -= 1;
+                    if shift || key.code == KeyCode::Char('H') {
+                        self.schedule.toggle_block(self.cursor);
+                    }
                 }
             }
-            KeyCode::Right | KeyCode::Char('l') => {
+            KeyCode::Right | KeyCode::Char('l') | KeyCode::Char('L') => {
+                if shift || key.code == KeyCode::Char('L') {
+                    self.schedule.toggle_block(self.cursor);
+                }
                 if self.cursor < 23 {
                     self.cursor += 1;
+                    if shift || key.code == KeyCode::Char('L') {
+                        self.schedule.toggle_block(self.cursor);
+                    }
                 }
             }
 
-            // Toggle hour block
+            // Toggle single hour block
             KeyCode::Char(' ') => {
                 self.schedule.toggle_block(self.cursor);
+            }
+
+            // Clear all planned blocks
+            KeyCode::Char('c') => {
+                self.schedule.clear_all();
             }
 
             // Switch which duration field to edit

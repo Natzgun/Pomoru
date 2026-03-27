@@ -12,9 +12,13 @@ pub fn render(frame: &mut Frame, app: &App, area: Rect) {
     let hints = match app.mode {
         InputMode::Setup => {
             let mut h = vec![
-                hint("←→", "hours"),
+                hint("←→", "move"),
                 sep(),
-                hint("space", "toggle hour"),
+                hint("space", "toggle"),
+                sep(),
+                hint("H/L", "select range"),
+                sep(),
+                hint("c", "clear"),
                 sep(),
                 hint("↑↓", "duration"),
                 sep(),

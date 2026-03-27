@@ -87,6 +87,15 @@ impl Schedule {
         self.completed_count
     }
 
+    /// Reset all planned blocks to unplanned
+    pub fn clear_all(&mut self) {
+        for block in self.blocks.iter_mut() {
+            if matches!(block, BlockState::Planned) {
+                *block = BlockState::Unplanned;
+            }
+        }
+    }
+
     /// Refresh current hour from system clock
     pub fn refresh_hour(&mut self) {
         self.current_hour = Local::now().hour() as u8;
