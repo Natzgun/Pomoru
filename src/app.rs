@@ -40,6 +40,7 @@ pub struct App {
     pub mode: InputMode,
     pub editing_field: DurationField,
     pub should_quit: bool,
+    pub confirm_quit: bool,
     pub completed_cycles: u32,
     pub tick_count: u64,
 }
@@ -58,6 +59,7 @@ impl App {
             mode: InputMode::Setup,
             editing_field: DurationField::Study,
             should_quit: false,
+            confirm_quit: false,
             completed_cycles: 0,
             tick_count: 0,
         }
@@ -115,6 +117,19 @@ impl App {
     }
 
     pub fn handle_key(&mut self, key: KeyEvent) {
+        // Handle quit confirmation
+        if self.confirm_quit {
+            match key.code {
+                KeyCode::Char('y') | KeyCode::Enter => {
+                    self.should_quit = true;
+                }
+                _ => {
+                    self.confirm_quit = false;
+                }
+            }
+            return;
+        }
+
         match self.mode {
             InputMode::Setup => self.handle_setup_key(key),
             InputMode::Active => self.handle_active_key(key),
@@ -209,7 +224,11 @@ impl App {
     fn handle_active_key(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') | KeyCode::Esc => {
-                self.should_quit = true;
+                if self.state == PomodoroState::Done {
+                    self.should_quit = true;
+                } else {
+                    self.confirm_quit = true;
+                }
             }
 
             // Pause / resume

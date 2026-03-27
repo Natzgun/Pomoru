@@ -9,6 +9,22 @@ use crate::app::{App, InputMode, PomodoroState};
 use crate::theme;
 
 pub fn render(frame: &mut Frame, app: &App, area: Rect) {
+    // Quit confirmation
+    if app.confirm_quit {
+        let confirm = Paragraph::new(Line::from(vec![
+            Span::styled(
+                " quit session? progress will be lost. ",
+                Style::default().fg(theme::TIMER_PAUSED),
+            ),
+            hint_highlight("y", "yes"),
+            Span::styled("  ", Style::default()),
+            hint("any", "cancel"),
+        ]))
+        .alignment(Alignment::Center);
+        frame.render_widget(confirm, area);
+        return;
+    }
+
     let hints = match app.mode {
         InputMode::Setup => {
             let mut h = vec![
