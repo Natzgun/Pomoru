@@ -99,12 +99,14 @@ fn run_loop(
         terminal.draw(|frame| ui::draw(frame, app))?;
 
         match poll_event(tick_rate) {
-            Some(AppEvent::Key(key)) => app.handle_key(key),
-            Some(AppEvent::Tick) => app.handle_tick(),
-            None => {}
+            Some(AppEvent::Key(key)) => {
+                app.handle_tick();
+                app.handle_key(key);
+            }
+            Some(AppEvent::Tick) | None => {
+                app.handle_tick();
+            }
         }
-
-        app.handle_tick();
 
         if app.should_quit {
             return Ok(());
