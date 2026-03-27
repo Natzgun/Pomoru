@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use chrono::Timelike;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::history::{History, SessionRecord};
@@ -55,7 +56,7 @@ impl App {
             break_minutes: break_min,
             schedule: Schedule::new(),
             timer: Timer::new(study_duration),
-            cursor: chrono::Local::now().format("%H").to_string().parse().unwrap_or(8),
+            cursor: chrono::Local::now().hour() as usize,
             mode: InputMode::Setup,
             editing_field: DurationField::Study,
             should_quit: false,
