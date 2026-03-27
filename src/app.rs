@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crossterm::event::{KeyCode, KeyEvent};
 
+use crate::notify;
 use crate::schedule::Schedule;
 use crate::timer::Timer;
 
@@ -86,17 +87,19 @@ impl App {
                 PomodoroState::Studying => {
                     self.schedule.complete_active();
                     self.completed_cycles += 1;
-                    // Transition to break
+                    notify::study_done(self.completed_cycles);
                     self.state = PomodoroState::Breaking;
                     self.timer.reset(self.break_duration());
                     self.timer.start();
                 }
                 PomodoroState::Breaking => {
                     if self.schedule.activate_next().is_some() {
+                        notify::break_done();
                         self.state = PomodoroState::Studying;
                         self.timer.reset(self.study_duration());
                         self.timer.start();
                     } else {
+                        notify::session_done(self.completed_cycles);
                         self.state = PomodoroState::Done;
                     }
                 }
